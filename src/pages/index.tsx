@@ -75,7 +75,7 @@ export default function Home() {
   if (!isStarted) {
     return (
       <div className="min-h-screen bg-gradient-luxury flex items-center justify-center p-4">
-        <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-10 max-w-lg w-full border border-luxury-gold-200">
+        <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-10 max-w-2xl w-full border border-luxury-gold-200">
           <div className="text-center mb-8">
             <h1 className="text-5xl font-bold mb-6 text-white">
               Be:On 머니 패턴 진단
