@@ -104,10 +104,11 @@ export default function Home() {
   if (!isStarted) {
     return (
       <div className="min-h-screen bg-gradient-luxury flex items-center justify-center p-4">
-        <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-10 max-w-2xl w-full border border-luxury-gold-200">
+        <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-6 md:p-10 max-w-2xl w-full border border-luxury-gold-200">
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold mb-6 text-white">
-              Be:On 머니 패턴 진단
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              <span className="block md:inline">Be:On</span>
+              <span className="block md:inline md:ml-2">머니 패턴 진단</span>
             </h1>
             <div className="text-center mb-6">
               <p className="text-lg text-white mb-4">
@@ -148,14 +149,15 @@ export default function Home() {
     const isComplex = topPatterns.length > 1;
 
     return (
-      <div className="min-h-screen bg-gradient-luxury p-4">
+      <div className="min-h-screen bg-gradient-luxury md:p-4">
         {/* 헤더 부분 */}
-        <div className="max-w-7xl mx-auto mb-8">
-          <div className="bg-gray-900/95 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border-2 border-luxury-gold-300">
+        <div className="max-w-none md:max-w-7xl mx-auto md:mb-8">
+          <div className="bg-gray-900/95 backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-4 md:p-10 md:border-2 md:border-luxury-gold-300">
             {/* 헤더 */}
             <div className="text-center mb-8">
-              <h2 className="text-4xl font-bold mb-4 text-white">
-                Be:On 머니 패턴 진단 결과
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+                <span className="block md:inline">Be:On</span>
+                <span className="block md:inline md:ml-2">머니 패턴 진단 결과</span>
               </h2>
               <p className="text-lg text-gray-300">
                 총 <span className="font-bold" style={{color: '#fdd828'}}>{totalSelected}개</span>의 문항을 선택하셨습니다
@@ -184,11 +186,11 @@ export default function Home() {
         </div>
 
         {/* 페이지 전체 좌우 분할 */}
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="max-w-none md:max-w-7xl mx-auto px-4 md:px-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-10">
             {/* 왼쪽: 핵심 패턴 결과 (슬라이더) - 2/3 크기 */}
             <div className="lg:col-span-2">
-              <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-luxury-gold-200 relative">
+              <div className="bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-4 md:p-8 md:border md:border-luxury-gold-200 relative">
                 {topPatterns.length > 1 && (
                   <div className="text-center mb-6">
                     <h4 className="text-xl font-bold text-white">핵심 패턴 상세</h4>
@@ -340,7 +342,7 @@ export default function Home() {
             </div>
 
             {/* 오른쪽: 전체 패턴 점수 + CTA - 1/3 크기 */}
-            <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-6 border border-luxury-gold-200 space-y-6">
+            <div className="bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-4 md:p-6 md:border md:border-luxury-gold-200 space-y-4 md:space-y-6">
                 {/* 모든 패턴 점수 - 컴팩트 테이블 형태 */}
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-dashed border-yellow-400">
                   <h4 className="text-xl font-bold mb-4 text-white flex items-center gap-2">
@@ -406,13 +408,13 @@ export default function Home() {
   const selectedCount = selectedAnswers.filter(answer => answer).length;
 
   return (
-    <div className="min-h-screen bg-gradient-luxury p-4">
+    <div className="min-h-screen bg-gradient-luxury md:p-4">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-10 border border-luxury-gold-200">
+        <div className="bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-4 md:p-10 md:border md:border-luxury-gold-200">
 
           {/* 헤더 */}
           <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold mb-4 text-white">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white whitespace-nowrap">
               Be:On 머니 패턴 진단
             </h2>
             <p className="text-lg text-gray-300 mb-4">
