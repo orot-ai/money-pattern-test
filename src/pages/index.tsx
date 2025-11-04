@@ -186,11 +186,11 @@ export default function Home() {
         </div>
 
         {/* 페이지 전체 좌우 분할 */}
-        <div className="max-w-none md:max-w-7xl mx-auto px-4 md:px-0">
+        <div className="max-w-none md:max-w-7xl mx-auto px-2 md:px-0">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-10">
             {/* 왼쪽: 핵심 패턴 결과 (슬라이더) - 2/3 크기 */}
             <div className="lg:col-span-2">
-              <div className="bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-4 md:p-8 md:border md:border-luxury-gold-200 relative">
+              <div className="md:bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-2 md:p-8 md:border md:border-luxury-gold-200 relative">
                 {topPatterns.length > 1 && (
                   <div className="text-center mb-6">
                     <h4 className="text-xl font-bold text-white">핵심 패턴 상세</h4>
@@ -342,7 +342,7 @@ export default function Home() {
             </div>
 
             {/* 오른쪽: 전체 패턴 점수 + CTA - 1/3 크기 */}
-            <div className="bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-4 md:p-6 md:border md:border-luxury-gold-200 space-y-4 md:space-y-6">
+            <div className="md:bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-2 md:p-6 md:border md:border-luxury-gold-200 space-y-4 md:space-y-6">
                 {/* 모든 패턴 점수 - 컴팩트 테이블 형태 */}
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-dashed border-yellow-400">
                   <h4 className="text-xl font-bold mb-4 text-white flex items-center gap-2">
