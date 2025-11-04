@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { moneyPatternQuestions, patternInfo, PatternType, MoneyPatternQuestion } from '@/data/moneyPatterns';
-import { Sparkles, TrendingUp, Zap, Heart, Shield, Trophy, Lock } from 'lucide-react';
+import { Sparkles, TrendingUp, Zap, Heart, Shield, Trophy, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PatternScores {
   [key: string]: number;
@@ -11,6 +11,7 @@ export default function Home() {
   const [selectedAnswers, setSelectedAnswers] = useState<boolean[]>(new Array(moneyPatternQuestions.length).fill(false));
   const [showResult, setShowResult] = useState(false);
   const [patternScores, setPatternScores] = useState<PatternScores>({});
+  const [currentPatternIndex, setCurrentPatternIndex] = useState(0);
 
   const toggleAnswer = (index: number) => {
     const newSelectedAnswers = [...selectedAnswers];
@@ -120,9 +121,9 @@ export default function Home() {
 
     return (
       <div className="min-h-screen bg-gradient-luxury p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-10 border border-luxury-gold-200">
-
+        {/* 헤더 부분 */}
+        <div className="max-w-7xl mx-auto mb-8">
+          <div className="bg-gray-900/95 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border-2 border-luxury-gold-300">
             {/* 헤더 */}
             <div className="text-center mb-8">
               <h2 className="text-4xl font-bold mb-4 text-white">
@@ -134,7 +135,7 @@ export default function Home() {
             </div>
 
             {/* 결과 제목 */}
-            <div className="text-center mb-8">
+            <div className="text-center">
               <h3 className="text-3xl font-bold text-white mb-4">
                 🎯 당신의 머니 패턴
               </h3>
@@ -143,7 +144,7 @@ export default function Home() {
                   <h4 className="text-2xl font-bold mb-2" style={{color: '#fdd828'}}>
                     {topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & ')} 복합입니다
                   </h4>
-                  <p className="text-gray-300">두 가지 패턴이 함께 작동하고 있어요.</p>
+                  <p className="text-gray-300">두 가지 이상의 패턴이 함께 작동하고 있어요.</p>
                 </div>
               ) : (
                 <h4 className="text-2xl font-bold" style={{color: '#fdd828'}}>
@@ -151,141 +152,218 @@ export default function Home() {
                 </h4>
               )}
             </div>
+          </div>
+        </div>
 
-            {/* 핵심 패턴 결과 */}
-            <div className="space-y-8 mb-8">
-              {topPatterns.map((pattern) => {
-                const info = patternInfo[pattern as PatternType];
-                const score = patternScores[pattern];
-                const IconComponent = getPatternIcon(pattern as PatternType);
-
-                return (
-                  <div key={pattern} className="bg-white/10 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-dashed border-yellow-400 text-white">
-                    <div className="flex items-center mb-6">
-                      <span className="text-4xl mr-4">{info.emoji}</span>
-                      <div>
-                        <h3 className="text-2xl font-bold text-white">
-                          {info.name}
-                        </h3>
-                        <p className="text-sm opacity-80 text-white">{score}개 문항 선택 (총 5개 문항 중)</p>
-                      </div>
-                    </div>
-
-                    {/* 핵심 패턴 설명 */}
-                    <div className="mb-6">
-                      <h4 className="text-xl font-bold mb-3 text-white">💡 핵심 패턴 설명</h4>
-                      <p className="text-lg mb-4 leading-relaxed text-white">
-                        {info.description}
-                      </p>
-                      <p className="text-lg font-medium italic text-center py-3 px-4 bg-white/10 rounded-lg" style={{color: '#fdd828'}}>
-                        {info.coreMessage}
-                      </p>
-                    </div>
-
-                    {/* 이 패턴의 빛 */}
-                    <div className="mb-6">
-                      <h4 className="text-xl font-bold mb-3 text-white">⭐ 이 패턴의 빛</h4>
-                      <ul className="space-y-2">
-                        {info.strengths.map((strength, index) => (
-                          <li key={index} className="text-white pl-4">
-                            • {strength}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* 이 패턴의 그림자 */}
-                    <div className="mb-6">
-                      <h4 className="text-xl font-bold mb-3 text-white">🌑 이 패턴의 그림자</h4>
-                      <ul className="space-y-3">
-                        {info.shadows.map((shadow, index) => (
-                          <li key={index} className="text-white">
-                            • {shadow}
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="mt-4 p-4 bg-red-900/20 rounded-lg border border-red-500/30">
-                        <p className="text-white font-medium">
-                          {info.shadowMessage}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* 머니 주권자로 가는 길 */}
-                    <div className="mb-6">
-                      <h4 className="text-xl font-bold mb-3 text-white">🎯 머니 주권자로 가는 길</h4>
-                      <p className="text-white leading-relaxed">
-                        {info.transformationPath}
-                      </p>
-                      <div className="mt-4 p-4 bg-white/10 rounded-lg">
-                        <p className="text-white">
-                          당신은 지금 자신의 무의식 돈 패턴을 발견했습니다.<br />
-                          이것이 첫 번째 단계입니다.<br /><br />
-                          다음 단계는?<br />
-                          이 패턴을 실제로 전환하는 것입니다.<br /><br />
-                          <span className="font-bold" style={{color: '#fdd828'}}>Be:On은 이 여정을 함께 걷습니다.</span>
-                        </p>
-                      </div>
-                    </div>
+        {/* 페이지 전체 좌우 분할 */}
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            {/* 왼쪽: 핵심 패턴 결과 (슬라이더) - 2/3 크기 */}
+            <div className="lg:col-span-2">
+              <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-luxury-gold-200 relative">
+                {topPatterns.length > 1 && (
+                  <div className="text-center mb-6">
+                    <h4 className="text-xl font-bold text-white">핵심 패턴 상세</h4>
                   </div>
-                );
-              })}
-            </div>
+                )}
 
-            {/* 모든 패턴 점수 - 컴팩트 테이블 형태 */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-8 border border-dashed border-yellow-400">
-              <h4 className="text-lg font-bold mb-3 text-white flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-luxury-gold-500" /> 전체 패턴 점수
-              </h4>
+                {/* 좌측 화살표 */}
+                {topPatterns.length > 1 && (
+                  <button
+                    onClick={() => setCurrentPatternIndex(Math.max(0, currentPatternIndex - 1))}
+                    disabled={currentPatternIndex === 0}
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-all z-10"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                )}
 
-              {/* 2열 테이블 형태로 최대한 컴팩트하게 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {Object.entries(patternScores).map(([pattern, score]) => {
+                {/* 우측 화살표 */}
+                {topPatterns.length > 1 && (
+                  <button
+                    onClick={() => setCurrentPatternIndex(Math.min(topPatterns.length - 1, currentPatternIndex + 1))}
+                    disabled={currentPatternIndex === topPatterns.length - 1}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/10 text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/20 transition-all z-10"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                )}
+
+                {/* 현재 패턴 표시 */}
+                {(() => {
+                  const pattern = topPatterns[currentPatternIndex];
                   const info = patternInfo[pattern as PatternType];
+                  const score = patternScores[pattern];
+
                   return (
-                    <div key={pattern} className="flex items-center justify-between bg-white/5 rounded-lg px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">{info.emoji}</span>
-                        <span className="text-white text-base font-medium">{info.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-12 bg-gray-700 rounded-full h-1.5">
-                          <div
-                            className="bg-gradient-gold h-1.5 rounded-full"
-                            style={{ width: `${(score / 5) * 100}%` }}
-                          />
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-dashed border-yellow-400 text-white">
+                      <div className="flex items-center mb-6">
+                        <span className="text-3xl mr-3">{info.emoji}</span>
+                        <div>
+                          <h3 className="text-xl font-bold text-white">
+                            {info.name}
+                          </h3>
+                          <p className="text-sm opacity-80 text-white">{score}개 문항 선택 (총 5개 문항 중)</p>
                         </div>
-                        <span className="text-yellow-200 text-base font-bold min-w-[24px]">{score}</span>
+                      </div>
+
+                      {/* 핵심 패턴 설명 */}
+                      <div className="mb-6">
+                        <h4 className="text-lg font-bold mb-3 text-white">💡 핵심 패턴 설명</h4>
+                        <p className="text-base mb-4 leading-relaxed text-white">
+                          {info.description}
+                        </p>
+                        <p className="text-base font-medium italic text-center py-3 px-4 bg-white/10 rounded-lg" style={{color: '#fdd828'}}>
+                          {info.coreMessage}
+                        </p>
+                      </div>
+
+                      {/* 이 패턴의 빛 */}
+                      <div className="mb-6">
+                        <h4 className="text-lg font-bold mb-3 text-white">⭐ 이 패턴의 빛</h4>
+                        <ul className="space-y-2">
+                          {info.strengths.map((strength, index) => (
+                            <li key={index} className="text-white text-sm pl-4">
+                              • {strength}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* 이 패턴의 그림자 */}
+                      <div className="mb-6">
+                        <h4 className="text-lg font-bold mb-3 text-white">🌑 이 패턴의 그림자</h4>
+                        <ul className="space-y-2">
+                          {info.shadows.map((shadow, index) => (
+                            <li key={index} className="text-white text-sm">
+                              • {shadow}
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="mt-4 p-3 bg-red-900/20 rounded-lg border border-red-500/30">
+                          <p className="text-white text-sm font-medium">
+                            {info.shadowMessage}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* 머니 주권자로 가는 길 */}
+                      <div className="mb-6">
+                        <h4 className="text-lg font-bold mb-3 text-white">🎯 머니 주권자로 가는 길</h4>
+                        <p className="text-white text-sm leading-relaxed">
+                          {info.transformationPath}
+                        </p>
+                        <div className="mt-4 p-3 bg-white/10 rounded-lg">
+                          <p className="text-white text-sm">
+                            당신은 지금 자신의 무의식 돈 패턴을 발견했습니다.<br />
+                            이것이 첫 번째 단계입니다.<br /><br />
+                            다음 단계는?<br />
+                            이 패턴을 실제로 전환하는 것입니다.<br /><br />
+                            <span className="font-bold" style={{color: '#fdd828'}}>Be:On은 이 여정을 함께 걷습니다.</span>
+                          </p>
+                        </div>
                       </div>
                     </div>
                   );
-                })}
+                })()}
+
+                {/* 썸네일 네비게이션 */}
+                {topPatterns.length > 1 && (
+                  <div className="mt-6 pt-4 border-t border-white/20">
+                    {/* 마스크가 적용된 컨테이너 */}
+                    <div className="relative overflow-hidden">
+                      {/* 좌측 페이드 마스크 */}
+                      <div className="absolute left-0 top-0 w-8 h-full bg-gradient-to-r from-[#191e37] to-transparent z-10 pointer-events-none"></div>
+                      {/* 우측 페이드 마스크 */}
+                      <div className="absolute right-0 top-0 w-8 h-full bg-gradient-to-l from-[#191e37] to-transparent z-10 pointer-events-none"></div>
+
+                      {/* 스크롤 가능한 썸네일 컨테이너 */}
+                      <div className="flex gap-3 px-8 py-2 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                        {topPatterns.map((pattern, index) => {
+                          const info = patternInfo[pattern as PatternType];
+                          const isActive = index === currentPatternIndex;
+                          return (
+                            <button
+                              key={pattern}
+                              onClick={() => setCurrentPatternIndex(index)}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-md transition-all duration-200 text-sm whitespace-nowrap flex-shrink-0 ${
+                                isActive
+                                  ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50 shadow-lg'
+                                  : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20 hover:text-white'
+                              }`}
+                            >
+                              <span className="text-base">{info.emoji}</span>
+                              <span className="font-medium">{info.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <p className="text-center text-white/60 text-xs mt-2">
+                      👆 패턴을 클릭하여 바로 이동하세요
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* CTA 버튼들 */}
-            <div className="space-y-4 mb-8">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-dashed border-yellow-400">
-                <h3 className="text-2xl font-bold mb-4 text-white">📞 30분 무료 진단 컨설팅 (인원 한정)</h3>
-                <p className="text-white mb-4">
-                  정상가 99,000원 → <span className="font-bold text-2xl" style={{color: '#fdd828'}}>무료</span>
-                </p>
-                <p className="text-gray-300 mb-6">
-                  사전 공지 없이 마감될 수 있습니다.
-                </p>
-                <a href="https://orot.ai" target="_blank" rel="noopener noreferrer" className="block w-full bg-gradient-gold hover:shadow-2xl text-deep-blue-950 py-5 px-8 rounded-2xl font-bold text-xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 shadow-lg border-2 border-luxury-gold-300 text-center">
-                  홈페이지로 돌아가기
-                </a>
-              </div>
-            </div>
+            {/* 오른쪽: 전체 패턴 점수 + CTA - 1/3 크기 */}
+            <div className="bg-gradient-deep backdrop-blur-sm rounded-3xl shadow-2xl p-6 border border-luxury-gold-200 space-y-6">
+                {/* 모든 패턴 점수 - 컴팩트 테이블 형태 */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-dashed border-yellow-400">
+                  <h4 className="text-xl font-bold mb-4 text-white flex items-center gap-2">
+                    <TrendingUp className="w-6 h-6 text-luxury-gold-500" /> 전체 패턴 점수
+                  </h4>
 
-            {/* 다시 테스트 버튼 */}
-            <button
-              onClick={resetTest}
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold transition-all duration-300"
-            >
-              다시 진단하기
-            </button>
+                  {/* 세로 리스트 형태로 변경 */}
+                  <div className="space-y-3">
+                    {Object.entries(patternScores).map(([pattern, score]) => {
+                      const info = patternInfo[pattern as PatternType];
+                      return (
+                        <div key={pattern} className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg">{info.emoji}</span>
+                            <span className="text-white text-base font-medium">{info.name}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 bg-gray-700 rounded-full h-2">
+                              <div
+                                className="bg-gradient-gold h-2 rounded-full"
+                                style={{ width: `${(score / 5) * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-yellow-200 text-base font-bold min-w-[24px]">{score}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* CTA 버튼들 */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center border border-dashed border-yellow-400">
+                  <h3 className="text-xl font-bold mb-4 text-white">📞 30분 무료 진단 컨설팅</h3>
+                  <p className="text-white text-base mb-4">
+                    정상가 99,000원 → <span className="font-bold text-xl" style={{color: '#fdd828'}}>무료</span>
+                  </p>
+                  <p className="text-gray-300 text-sm mb-5">
+                    사전 공지 없이 마감될 수 있습니다.
+                  </p>
+                </div>
+
+              {/* 홈페이지로 돌아가기 버튼 */}
+              <a href="https://orot.ai" target="_blank" rel="noopener noreferrer" className="block w-full bg-gradient-gold hover:shadow-2xl text-deep-blue-950 py-4 px-6 rounded-xl font-bold text-base transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-luxury-gold-300 text-center">
+                홈페이지로 돌아가기
+              </a>
+
+              {/* 다시 테스트 버튼 */}
+              <button
+                onClick={resetTest}
+                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-4 px-6 rounded-xl font-semibold text-base transition-all duration-300"
+              >
+                다시 진단하기
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -343,12 +421,10 @@ export default function Home() {
 
                   {/* 문항 번호와 텍스트 */}
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-sm font-bold text-yellow-400">Q{index + 1}</span>
-                    </div>
                     <p className={`text-lg leading-relaxed transition-all duration-300 ${
                       selectedAnswers[index] ? 'text-white font-medium' : 'text-white'
                     }`}>
+                      <span className="text-sm font-bold text-yellow-400 mr-3">Q{index + 1}</span>
                       {question.text}
                     </p>
                   </div>
