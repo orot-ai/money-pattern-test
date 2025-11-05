@@ -387,7 +387,7 @@ export default function Home() {
                 </div>
 
               {/* 30분 무료 진단 컨설팅 버튼 */}
-              <a href="https://open.kakao.com/o/sX81ks0h" target="_blank" rel="noopener noreferrer" className="block w-full bg-gradient-gold hover:shadow-2xl text-deep-blue-950 py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-luxury-gold-300 text-center">
+              <a href="https://open.kakao.com/o/sZqVwt0h" target="_blank" rel="noopener noreferrer" className="block w-full bg-gradient-gold hover:shadow-2xl text-deep-blue-950 py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg border-2 border-luxury-gold-300 text-center">
                 30분 무료 진단 컨설팅
               </a>
 
