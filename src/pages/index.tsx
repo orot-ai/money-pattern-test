@@ -130,7 +130,7 @@ export default function Home() {
       }
     });
 
-    // 최고 점수 패턴 찾기
+    // 최고 점수 코드 찾기
     const maxScore = Math.max(...Object.values(scores));
     const topPatterns = Object.entries(scores)
       .filter(([_, score]) => score === maxScore && score > 0)
@@ -152,7 +152,7 @@ export default function Home() {
       marketing_consent: marketingConsent,
 
       // 진단 결과
-      result_patterns: topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & '),
+      result_codes: topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & '),
       is_complex: topPatterns.length > 1,
       total_selected: totalSelected,
 
@@ -162,7 +162,7 @@ export default function Home() {
       duration_seconds: durationSeconds,
       duration_minutes: durationMinutes,
 
-      // 각 패턴별 점수
+      // 각 코드별 점수
       achievement_score: scores['achievement-oriented'],
       dominance_score: scores['dominance-oriented'],
       dependency_safety_score: scores['dependency-safety'],
@@ -206,7 +206,7 @@ export default function Home() {
       }
     });
 
-    // 최고 점수 패턴 찾기
+    // 최고 점수 코드 찾기
     const maxScore = Math.max(...Object.values(scores));
     const topPatterns = Object.entries(scores)
       .filter(([_, score]) => score === maxScore && score > 0)
@@ -281,11 +281,11 @@ export default function Home() {
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
               <span className="block md:inline">Be:On</span>
-              <span className="block md:inline md:ml-2">머니 패턴 진단</span>
+              <span className="block md:inline md:ml-2">머니 코드 진단</span>
             </h1>
             <div className="text-center mb-6">
               <p className="text-lg text-white mb-4">
-                당신의 <span className="text-white">'돈 패턴'</span>을 발견하는 시간
+                당신의 <span className="text-white">'돈 코드'</span>을 발견하는 시간
               </p>
               <p className="text-white mb-4">
                 아래 35개 문항을 읽고,<br />
@@ -439,7 +439,7 @@ export default function Home() {
                     }
                   });
 
-                  // 최고 점수 패턴 찾기
+                  // 최고 점수 코드 찾기
                   const maxScore = Math.max(...Object.values(scores));
                   const topPatterns = Object.entries(scores)
                     .filter(([_, score]) => score === maxScore && score > 0)
@@ -460,7 +460,7 @@ export default function Home() {
                     marketing_consent: false,
 
                     // 진단 결과
-                    result_patterns: topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & '),
+                    result_codes: topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & '),
                     is_complex: topPatterns.length > 1,
                     total_selected: totalSelected,
 
@@ -470,7 +470,7 @@ export default function Home() {
                     duration_seconds: durationSeconds,
                     duration_minutes: durationMinutes,
 
-                    // 각 패턴별 점수
+                    // 각 코드별 점수
                     achievement_score: scores['achievement-oriented'],
                     dominance_score: scores['dominance-oriented'],
                     dependency_safety_score: scores['dependency-safety'],
@@ -547,7 +547,7 @@ export default function Home() {
             <div className="text-center mb-8">
               <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
                 <span className="block md:inline">Be:On</span>
-                <span className="block md:inline md:ml-2">머니 패턴 진단 결과</span>
+                <span className="block md:inline md:ml-2">머니 코드 진단 결과</span>
               </h2>
               <p className="text-lg text-gray-300">
                 총 <span className="font-bold" style={{color: '#fdd828'}}>{totalSelected}개</span>의 문항을 선택하셨습니다
@@ -557,14 +557,14 @@ export default function Home() {
             {/* 결과 제목 */}
             <div className="text-center">
               <h3 className="text-3xl font-bold text-white mb-4">
-                🎯 당신의 머니 패턴
+                🎯 당신의 머니 코드
               </h3>
               {isComplex ? (
                 <div>
                   <h4 className="text-2xl font-bold mb-2" style={{color: '#fdd828'}}>
-                    {topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & ')} 복합입니다
+                    {topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & ')} 콤보입니다
                   </h4>
-                  <p className="text-gray-300">두 가지 이상의 패턴이 함께 작동하고 있어요.</p>
+                  <p className="text-gray-300">두 가지 이상의 코드가 함께 작동하고 있어요.</p>
                 </div>
               ) : (
                 <h4 className="text-2xl font-bold" style={{color: '#fdd828'}}>
@@ -578,12 +578,12 @@ export default function Home() {
         {/* 페이지 전체 좌우 분할 */}
         <div className="max-w-none md:max-w-7xl mx-auto px-2 md:px-0">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-10">
-            {/* 왼쪽: 핵심 패턴 결과 (슬라이더) - 2/3 크기 */}
+            {/* 왼쪽: 핵심 코드 결과 (슬라이더) - 2/3 크기 */}
             <div className="lg:col-span-2">
               <div className="md:bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-2 md:p-8 md:border md:border-luxury-gold-200 relative">
                 {topPatterns.length > 1 && (
                   <div className="text-center mb-6">
-                    <h4 className="text-xl font-bold text-white">핵심 패턴 상세</h4>
+                    <h4 className="text-xl font-bold text-white">핵심 코드 상세</h4>
                   </div>
                 )}
 
@@ -609,7 +609,7 @@ export default function Home() {
                   </button>
                 )}
 
-                {/* 현재 패턴 표시 */}
+                {/* 현재 코드 표시 */}
                 {(() => {
                   const pattern = topPatterns[currentPatternIndex];
                   const info = patternInfo[pattern as PatternType];
@@ -627,9 +627,9 @@ export default function Home() {
                         </div>
                       </div>
 
-                      {/* 핵심 패턴 설명 */}
+                      {/* 핵심 코드 설명 */}
                       <div className="mb-6">
-                        <h4 className="text-lg font-bold mb-3 text-white">💡 핵심 패턴 설명</h4>
+                        <h4 className="text-lg font-bold mb-3 text-white">💡 핵심 코드 설명</h4>
                         <p className="text-base mb-4 leading-relaxed text-white">
                           {info.description}
                         </p>
@@ -638,9 +638,9 @@ export default function Home() {
                         </p>
                       </div>
 
-                      {/* 이 패턴의 빛 */}
+                      {/* 이 코드의 빛 */}
                       <div className="mb-6">
-                        <h4 className="text-lg font-bold mb-3 text-white">⭐ 이 패턴의 빛</h4>
+                        <h4 className="text-lg font-bold mb-3 text-white">⭐ 이 코드의 빛</h4>
                         <ul className="space-y-2">
                           {info.strengths.map((strength, index) => (
                             <li key={index} className="text-white text-sm pl-4">
@@ -650,9 +650,9 @@ export default function Home() {
                         </ul>
                       </div>
 
-                      {/* 이 패턴의 그림자 */}
+                      {/* 이 코드의 그림자 */}
                       <div className="mb-6">
-                        <h4 className="text-lg font-bold mb-3 text-white">🌑 이 패턴의 그림자</h4>
+                        <h4 className="text-lg font-bold mb-3 text-white">🌑 이 코드의 그림자</h4>
                         <ul className="space-y-2">
                           {info.shadows.map((shadow, index) => (
                             <li key={index} className="text-white text-sm">
@@ -675,10 +675,10 @@ export default function Home() {
                         </p>
                         <div className="mt-4 p-3 bg-white/10 rounded-lg">
                           <p className="text-white text-sm">
-                            당신은 지금 자신의 무의식 돈 패턴을 발견했습니다.<br />
+                            당신은 지금 자신의 무의식 돈 코드을 발견했습니다.<br />
                             이것이 첫 번째 단계입니다.<br /><br />
                             다음 단계는?<br />
-                            이 패턴을 실제로 전환하는 것입니다.<br /><br />
+                            이 코드을 실제로 전환하는 것입니다.<br /><br />
                             <span className="font-bold" style={{color: '#fdd828'}}>Be:On은 이 여정을 함께 걷습니다.</span>
                           </p>
                         </div>
@@ -724,19 +724,19 @@ export default function Home() {
                       </div>
                     </div>
                     <p className="text-center text-white/60 text-xs mt-2">
-                      👆 패턴을 클릭하여 바로 이동하세요
+                      👆 코드을 클릭하여 바로 이동하세요
                     </p>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* 오른쪽: 전체 패턴 점수 + CTA - 1/3 크기 */}
+            {/* 오른쪽: 전체 코드 점수 + CTA - 1/3 크기 */}
             <div className="md:bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-2 md:p-6 md:border md:border-luxury-gold-200 space-y-4 md:space-y-6">
-                {/* 모든 패턴 점수 - 컴팩트 테이블 형태 */}
+                {/* 모든 코드 점수 - 컴팩트 테이블 형태 */}
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-dashed border-yellow-400">
                   <h4 className="text-xl font-bold mb-4 text-white flex items-center gap-2">
-                    <TrendingUp className="w-6 h-6 text-luxury-gold-500" /> 전체 패턴 점수
+                    <TrendingUp className="w-6 h-6 text-luxury-gold-500" /> 전체 코드 점수
                   </h4>
 
                   {/* 세로 리스트 형태로 변경 */}
@@ -837,7 +837,7 @@ export default function Home() {
           {/* 헤더 */}
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white whitespace-nowrap">
-              Be:On 머니 패턴 진단
+              Be:On 머니 코드 진단
             </h2>
             <p className="text-lg text-gray-300 mb-4">
               편안한 마음으로, '지금의 나'와 조금이라도 닮았다고 느껴지는 문항에 체크하세요
