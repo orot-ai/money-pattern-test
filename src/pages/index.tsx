@@ -22,9 +22,12 @@ interface PatternScores {
 export default function Home() {
   const [isStarted, setIsStarted] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState<boolean[]>(new Array(moneyPatternQuestions.length).fill(false));
+  const [showEmailForm, setShowEmailForm] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [patternScores, setPatternScores] = useState<PatternScores>({});
   const [currentPatternIndex, setCurrentPatternIndex] = useState(0);
+  const [userEmail, setUserEmail] = useState('');
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToCenter = (index: number) => {
@@ -61,6 +64,22 @@ export default function Home() {
   };
 
   const handleSubmit = () => {
+    setShowEmailForm(true);
+  };
+
+  const handleEmailSubmit = () => {
+    if (!userEmail.trim()) {
+      alert('이메일을 입력해주세요.');
+      return;
+    }
+
+    // 이메일 수집 이벤트 추적
+    trackEvent('email_collected', {
+      email: userEmail,
+      marketing_consent: marketingConsent,
+      timestamp: new Date().toISOString()
+    });
+
     calculateResults(selectedAnswers);
   };
 
@@ -127,8 +146,11 @@ export default function Home() {
 
     setIsStarted(false);
     setSelectedAnswers(new Array(moneyPatternQuestions.length).fill(false));
+    setShowEmailForm(false);
     setShowResult(false);
     setPatternScores({});
+    setUserEmail('');
+    setMarketingConsent(false);
   };
 
   const getPatternIcon = (pattern: PatternType) => {
@@ -186,6 +208,96 @@ export default function Home() {
           >
             진단 시작하기
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 이메일 입력 화면
+  if (showEmailForm && !showResult) {
+    const selectedCount = selectedAnswers.filter(answer => answer).length;
+
+    return (
+      <div className="min-h-screen bg-gradient-luxury md:p-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-gradient-deep backdrop-blur-sm md:rounded-3xl md:shadow-2xl p-4 md:p-10 md:border md:border-luxury-gold-200">
+
+            {/* 헤더 */}
+            <div className="text-center mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+                <span className="block md:inline">🎉 진단이 완료되었습니다!</span>
+              </h2>
+              <p className="text-lg text-gray-300 mb-4">
+                총 <span className="font-bold text-yellow-400">{selectedCount}개</span>의 문항을 선택하셨습니다
+              </p>
+            </div>
+
+            {/* 이메일 폼 */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-6 border border-dashed border-yellow-400">
+              <h3 className="text-xl font-bold mb-4 text-white text-center">
+                📧 상세한 결과를 받고 싶다면 이메일을 입력해주세요
+              </h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-white text-sm font-medium mb-2">
+                    이메일 주소
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                    placeholder="example@email.com"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 text-gray-900"
+                  />
+                </div>
+
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id="marketing"
+                    checked={marketingConsent}
+                    onChange={(e) => setMarketingConsent(e.target.checked)}
+                    className="mt-1 h-4 w-4 text-yellow-400 focus:ring-yellow-400 border-gray-300 rounded"
+                  />
+                  <label htmlFor="marketing" className="text-white text-sm">
+                    마케팅 활용에 동의합니다. (선택)
+                    <br />
+                    <span className="text-gray-400 text-xs">
+                      머니 패턴 관련 유용한 정보를 이메일로 받아보실 수 있습니다.
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <button
+                onClick={handleEmailSubmit}
+                className="w-full mt-6 bg-gradient-gold hover:shadow-2xl text-deep-blue-950 py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 transform hover:-translate-y-1"
+              >
+                상세한 결과 보기
+              </button>
+
+              <button
+                onClick={() => {
+                  setUserEmail('');
+                  setMarketingConsent(false);
+                  calculateResults(selectedAnswers);
+                }}
+                className="w-full mt-3 bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-xl font-medium text-base transition-all duration-300"
+              >
+                이메일 입력 없이 결과만 보기
+              </button>
+            </div>
+
+            {/* 안내 문구 */}
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">
+                ⚡ 입력하신 이메일은 안전하게 보호되며, 결과 발송 외의 용도로 사용되지 않습니다.
+              </p>
+            </div>
+
+          </div>
         </div>
       </div>
     );
