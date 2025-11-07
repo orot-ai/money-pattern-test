@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { moneyPatternQuestions, patternInfo, PatternType, MoneyPatternQuestion } from '@/data/moneyPatterns';
 import { Sparkles, TrendingUp, Zap, Heart, Shield, Trophy, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -15,6 +15,31 @@ const trackEvent = (eventName: string, parameters: Record<string, any> = {}) => 
   }
 };
 
+// Make 웹훅으로 데이터 전송
+const sendToMakeWebhook = async (data: Record<string, any>) => {
+  const webhookUrl = 'https://hook.eu2.make.com/suo29jw8wh9js9z3c8opjsw8gvj4ij48';
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log('데이터가 성공적으로 전송되었습니다:', data);
+    return true;
+  } catch (error) {
+    console.error('웹훅 전송 실패:', error);
+    return false;
+  }
+};
+
 interface PatternScores {
   [key: string]: number;
 }
@@ -27,7 +52,11 @@ export default function Home() {
   const [patternScores, setPatternScores] = useState<PatternScores>({});
   const [currentPatternIndex, setCurrentPatternIndex] = useState(0);
   const [userEmail, setUserEmail] = useState('');
+  const [userName, setUserName] = useState('');
   const [marketingConsent, setMarketingConsent] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [testStartTime, setTestStartTime] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToCenter = (index: number) => {
@@ -67,17 +96,93 @@ export default function Home() {
     setShowEmailForm(true);
   };
 
-  const handleEmailSubmit = () => {
+  const showError = (message: string) => {
+    setErrorMessage(message);
+    setShowErrorModal(true);
+  };
+
+  const handleEmailSubmit = async () => {
     if (!userEmail.trim()) {
-      alert('이메일을 입력해주세요.');
+      showError('이메일을 입력해주세요.');
       return;
     }
 
-    // 이메일 수집 이벤트 추적
+    if (!marketingConsent) {
+      showError('상세한 결과지를 받기 위해서는 마케팅 활용 동의가 필요합니다.');
+      return;
+    }
+
+    // 점수 미리 계산
+    const scores: PatternScores = {
+      'achievement-oriented': 0,
+      'dominance-oriented': 0,
+      'dependency-safety': 0,
+      'impulse-anxiety': 0,
+      'sacrifice-scarcity': 0,
+      'detachment-avoidance': 0,
+      'past-fixation': 0
+    };
+
+    selectedAnswers.forEach((answer, index) => {
+      if (answer) {
+        const pattern = moneyPatternQuestions[index].pattern;
+        scores[pattern] += 1;
+      }
+    });
+
+    // 최고 점수 패턴 찾기
+    const maxScore = Math.max(...Object.values(scores));
+    const topPatterns = Object.entries(scores)
+      .filter(([_, score]) => score === maxScore && score > 0)
+      .map(([pattern, _]) => pattern);
+
+    const totalSelected = selectedAnswers.filter(answer => answer).length;
+    const timestamp = new Date().toISOString();
+    const endTime = Date.now();
+    const durationSeconds = testStartTime ? Math.round((endTime - testStartTime) / 1000) : null;
+    const durationMinutes = durationSeconds ? Math.round(durationSeconds / 60 * 10) / 10 : null;
+
+
+    // 웹훅으로 전송할 데이터 구성
+    const webhookData = {
+      // 기본 정보
+      timestamp,
+      name: userName || null,
+      email: userEmail,
+      marketing_consent: marketingConsent,
+
+      // 진단 결과
+      result_patterns: topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & '),
+      is_complex: topPatterns.length > 1,
+      total_selected: totalSelected,
+
+      // 시간 측정
+      test_start_time: testStartTime ? new Date(testStartTime).toISOString() : null,
+      test_end_time: new Date(endTime).toISOString(),
+      duration_seconds: durationSeconds,
+      duration_minutes: durationMinutes,
+
+      // 각 패턴별 점수
+      achievement_score: scores['achievement-oriented'],
+      dominance_score: scores['dominance-oriented'],
+      dependency_safety_score: scores['dependency-safety'],
+      impulse_anxiety_score: scores['impulse-anxiety'],
+      sacrifice_scarcity_score: scores['sacrifice-scarcity'],
+      detachment_avoidance_score: scores['detachment-avoidance'],
+      past_fixation_score: scores['past-fixation'],
+
+      // 의미 있는 데이터만 전송
+    };
+
+    // 웹훅으로 데이터 전송
+    const webhookSuccess = await sendToMakeWebhook(webhookData);
+
+    // Google Analytics 이벤트 추적
     trackEvent('email_collected', {
       email: userEmail,
       marketing_consent: marketingConsent,
-      timestamp: new Date().toISOString()
+      webhook_sent: webhookSuccess,
+      timestamp
     });
 
     calculateResults(selectedAnswers);
@@ -150,7 +255,9 @@ export default function Home() {
     setShowResult(false);
     setPatternScores({});
     setUserEmail('');
+    setUserName('');
     setMarketingConsent(false);
+    setTestStartTime(null);
   };
 
   const getPatternIcon = (pattern: PatternType) => {
@@ -200,6 +307,7 @@ export default function Home() {
           <button
             onClick={() => {
               setIsStarted(true);
+              setTestStartTime(Date.now());
               trackEvent('test_started', {
                 timestamp: new Date().toISOString()
               });
@@ -209,6 +317,25 @@ export default function Home() {
             진단 시작하기
           </button>
         </div>
+
+        {/* 커스텀 에러 모달 */}
+        {showErrorModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+              <div className="text-center">
+                <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">알림</h3>
+                <p className="text-gray-600 mb-6">{errorMessage}</p>
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="w-full bg-gradient-gold hover:shadow-lg text-deep-blue-950 py-3 px-6 rounded-lg font-bold transition-all duration-300"
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -240,8 +367,22 @@ export default function Home() {
 
               <div className="space-y-4">
                 <div>
+                  <label htmlFor="name" className="block text-white text-sm font-medium mb-2">
+                    이름 <span className="text-gray-400 text-xs">(선택사항)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    placeholder="김머니"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 text-gray-900"
+                  />
+                </div>
+
+                <div>
                   <label htmlFor="email" className="block text-white text-sm font-medium mb-2">
-                    이메일 주소
+                    이메일 주소 *
                   </label>
                   <input
                     type="email"
@@ -262,10 +403,10 @@ export default function Home() {
                     className="mt-1 h-4 w-4 text-yellow-400 focus:ring-yellow-400 border-gray-300 rounded"
                   />
                   <label htmlFor="marketing" className="text-white text-sm">
-                    마케팅 활용에 동의합니다. (선택)
+                    마케팅 활용에 동의합니다. *
                     <br />
                     <span className="text-gray-400 text-xs">
-                      머니 패턴 관련 유용한 정보를 이메일로 받아보실 수 있습니다.
+                      상세한 결과지를 받으려면 필수 동의가 필요합니다.
                     </span>
                   </label>
                 </div>
@@ -279,8 +420,77 @@ export default function Home() {
               </button>
 
               <button
-                onClick={() => {
+                onClick={async () => {
+                  // 점수 미리 계산
+                  const scores: PatternScores = {
+                    'achievement-oriented': 0,
+                    'dominance-oriented': 0,
+                    'dependency-safety': 0,
+                    'impulse-anxiety': 0,
+                    'sacrifice-scarcity': 0,
+                    'detachment-avoidance': 0,
+                    'past-fixation': 0
+                  };
+
+                  selectedAnswers.forEach((answer, index) => {
+                    if (answer) {
+                      const pattern = moneyPatternQuestions[index].pattern;
+                      scores[pattern] += 1;
+                    }
+                  });
+
+                  // 최고 점수 패턴 찾기
+                  const maxScore = Math.max(...Object.values(scores));
+                  const topPatterns = Object.entries(scores)
+                    .filter(([_, score]) => score === maxScore && score > 0)
+                    .map(([pattern, _]) => pattern);
+
+                  const totalSelected = selectedAnswers.filter(answer => answer).length;
+                  const timestamp = new Date().toISOString();
+                  const endTime = Date.now();
+                  const durationSeconds = testStartTime ? Math.round((endTime - testStartTime) / 1000) : null;
+                  const durationMinutes = durationSeconds ? Math.round(durationSeconds / 60 * 10) / 10 : null;
+
+                  // 웹훅으로 전송할 데이터 구성 (이메일 없음)
+                  const webhookData = {
+                    // 기본 정보
+                    timestamp,
+                    name: userName || null,
+                    email: null, // 이메일 입력하지 않음
+                    marketing_consent: false,
+
+                    // 진단 결과
+                    result_patterns: topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & '),
+                    is_complex: topPatterns.length > 1,
+                    total_selected: totalSelected,
+
+                    // 시간 측정
+                    test_start_time: testStartTime ? new Date(testStartTime).toISOString() : null,
+                    test_end_time: new Date(endTime).toISOString(),
+                    duration_seconds: durationSeconds,
+                    duration_minutes: durationMinutes,
+
+                    // 각 패턴별 점수
+                    achievement_score: scores['achievement-oriented'],
+                    dominance_score: scores['dominance-oriented'],
+                    dependency_safety_score: scores['dependency-safety'],
+                    impulse_anxiety_score: scores['impulse-anxiety'],
+                    sacrifice_scarcity_score: scores['sacrifice-scarcity'],
+                    detachment_avoidance_score: scores['detachment-avoidance'],
+                    past_fixation_score: scores['past-fixation'],
+                  };
+
+                  // 웹훅으로 데이터 전송
+                  const webhookSuccess = await sendToMakeWebhook(webhookData);
+
+                  // Google Analytics 이벤트 추적
+                  trackEvent('skip_email_collection', {
+                    webhook_sent: webhookSuccess,
+                    timestamp
+                  });
+
                   setUserEmail('');
+                  setUserName('');
                   setMarketingConsent(false);
                   calculateResults(selectedAnswers);
                 }}
@@ -299,6 +509,25 @@ export default function Home() {
 
           </div>
         </div>
+
+        {/* 커스텀 에러 모달 */}
+        {showErrorModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+              <div className="text-center">
+                <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">알림</h3>
+                <p className="text-gray-600 mb-6">{errorMessage}</p>
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="w-full bg-gradient-gold hover:shadow-lg text-deep-blue-950 py-3 px-6 rounded-lg font-bold transition-all duration-300"
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -574,6 +803,25 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* 커스텀 에러 모달 */}
+        {showErrorModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+              <div className="text-center">
+                <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">알림</h3>
+                <p className="text-gray-600 mb-6">{errorMessage}</p>
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="w-full bg-gradient-gold hover:shadow-lg text-deep-blue-950 py-3 px-6 rounded-lg font-bold transition-all duration-300"
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -671,6 +919,25 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* 커스텀 에러 모달 */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <div className="text-center">
+              <div className="text-red-500 text-4xl mb-4">⚠️</div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">알림</h3>
+              <p className="text-gray-600 mb-6">{errorMessage}</p>
+              <button
+                onClick={() => setShowErrorModal(false)}
+                className="w-full bg-gradient-gold hover:shadow-lg text-deep-blue-950 py-3 px-6 rounded-lg font-bold transition-all duration-300"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
