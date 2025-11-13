@@ -152,7 +152,7 @@ export default function Home() {
       marketing_consent: marketingConsent,
 
       // 진단 결과
-      result_codes: topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(' & '),
+      result_codes: topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(', '),
       is_complex: topPatterns.length > 1,
       total_selected: totalSelected,
 
