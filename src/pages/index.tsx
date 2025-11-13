@@ -153,6 +153,7 @@ export default function Home() {
 
       // 진단 결과
       result_codes: topPatterns.map(pattern => patternInfo[pattern as PatternType].name).join(', '),
+      result_codes_array: topPatterns.map(pattern => patternInfo[pattern as PatternType].name),
       is_complex: topPatterns.length > 1,
       total_selected: totalSelected,
 
